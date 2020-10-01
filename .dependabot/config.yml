@@ -1,0 +1,51 @@
+# This is an example config
+# DOCS: https://dependabot.com/docs/config-file/
+version: 1 #required
+update_configs: #required
+  - package_manager: "javascript" #required - options: javascript, ruby:bundler, php:composer, python, go:modules, go:dep, java:maven, java:gradle, dotnet:nuget, rust:cargo, elixir:hex, docker, terraform, submodules, elm
+    directory: "/" #required
+    update_schedule: "live" #required - options: live (check docs for supported package_managers, daily (weekdays only), weekly, monthly
+    target_branch: "main" #optional (default is default branch)
+    default_reviewers: #optional
+      - ""
+    default_assignees: #optional
+      - ""
+    default_labels: #optional
+      - "dependabot"
+    default_milestone: 1 #optional
+    allowed_updates: #optional, please see docs
+    ignored_updates: #optional, plese see docs
+    automerged_updates: #optional, please see docs
+    version_requirement_updates: #optional, please see docs
+    commit_message: #optional, please see docs
+
+# # An example completed config
+# # NOTE: - The target branch is the default branch (e.g. master/main)
+# #       - The dependabot in this case will only bump versions for a security update
+# #         instead of bumping each dependency on latest releases
+# version: 1
+# update_configs:
+#   - package_manager: "go:modules"
+#     directory: "/"
+#     update_schedule: "daily"
+#     allowed_updates:
+#       - match:
+#          update_type: "security"
+#   - package_manager: "python"
+#     directory: "/test"
+#     update_schedule: "daily"
+#     allowed_updates:
+#       - match:
+#          update_type: "security"
+#   - package_manager: "docker"
+#     directory: "/"
+#     update_schedule: "daily"
+#     allowed_updates:
+#       - match:
+#          update_type: "security"
+#   - package_manager: "terraform"
+#     directory: "/terraform/prod"
+#     update_schedule: "daily"
+#     allowed_updates:
+#       - match:
+#          update_type: "security"
