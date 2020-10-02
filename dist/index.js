@@ -1666,6 +1666,7 @@ exports.default = run;
 function parseBoolean(toParse) {
     return !!(toParse && toParse.toLowerCase() === 'true');
 }
+run();
 
 
 /***/ }),

@@ -111,3 +111,5 @@ export default run
 function parseBoolean(toParse: string): boolean {
   return !!(toParse && toParse.toLowerCase() === 'true')
 }
+
+run()
