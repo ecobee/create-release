@@ -6,7 +6,8 @@ import {
   successfulComparisonResponse,
   successfulTagResponse,
   preReleaseTagResponse,
-  upToDateComparisonResponse
+  upToDateComparisonResponse,
+  successCreateReleaseResponse
 } from './mockResponses'
 
 const nock = require('nock')
@@ -39,6 +40,11 @@ afterEach(() => {
 
 describe('Run', () => {
   it('sets all the outputs on a successful run', async () => {
+    const expectedChangelog = fs.readFileSync(
+      __dirname + '/expected-changelog.md',
+      'utf8'
+    )
+
     nock('https://api.github.com')
       .persist()
       .get('/repos/foo/bar/releases')
@@ -47,10 +53,18 @@ describe('Run', () => {
       .persist()
       .get('/repos/foo/bar/compare/v1.0.0...master')
       .reply(200, successfulComparisonResponse)
+    nock('https://api.github.com')
+      .persist()
+      .post('/repos/foo/bar/releases', {
+        tag_name: 'v1.0.1',
+        name: 'v1.0.1',
+        body: expectedChangelog
+      })
+      .reply(201, successfulComparisonResponse)
 
     const setOutput = jest.spyOn(core, 'setOutput')
     const debugMock = jest.spyOn(core, 'debug')
-    const expectedChangelog = fs.readFileSync(__dirname + '/expected-changelog.md', 'utf8')
+    const setFailed = jest.spyOn(core, 'setFailed')
     await run()
 
     expect(debugMock).toHaveBeenCalledWith('master is behind by 4 commit(s)')
@@ -72,6 +86,7 @@ describe('Run', () => {
       '2013-02-27T19:35:32Z'
     )
     expect(setOutput).toHaveBeenCalledWith('changelog', expectedChangelog)
+    expect(setFailed).not.toHaveBeenCalled()
   })
 
   it('does not create a release if the github token env variable is not set', async () => {

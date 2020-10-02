@@ -58,7 +58,8 @@ const run = async (): Promise<void> => {
       return
     }
 
-    const newVersion = "v" + semver.inc(latestRelease?.tag_name, 'patch')
+    const newTag = semver.inc(latestRelease?.tag_name, 'patch')
+    const newVersion = `v${newTag}`
     core.setOutput('new-version', newVersion)
     core.setOutput(
       'release-url',
@@ -70,8 +71,8 @@ const run = async (): Promise<void> => {
 
     let authors = ''
     let commitSummary = ''
-    let foundAuthors = new Map<string, boolean>()
-    comparison.commits.forEach(commit => {
+    const foundAuthors = new Map<string, boolean>()
+    for (const commit of comparison.commits) {
       if (!foundAuthors.get(commit.author.login)) {
         authors += `* [${commit.author.login}](${commit.author.html_url})\n`
         foundAuthors.set(commit.author.login, true)
@@ -79,19 +80,27 @@ const run = async (): Promise<void> => {
 
       let truncatedCommit = commit.commit.message
       if (!truncatedCommit) {
-        return
+        continue
       }
 
-      let commitLines = commit.commit.message.split('\n')
+      const commitLines = commit.commit.message.split('\n')
       if (commitLines.length > 0) {
         truncatedCommit = commitLines[0]
       }
       commitSummary += `* ${truncatedCommit} ([${commit.sha.slice(0, 7)}](${
         commit.html_url
       }))\n`
-    })
+    }
     const changeLog = `## Authors\n\n${authors}\n## Changes\n\n${compareUrl}\n\n${commitSummary}`
     core.setOutput('changelog', changeLog)
+
+    await octokit.repos.createRelease({
+      owner,
+      repo,
+      tag_name: newVersion, // eslint-disable-line @typescript-eslint/camelcase
+      name: newVersion,
+      body: changeLog
+    })
   } catch (error) {
     core.setFailed(`create-release failure: ${error}`)
   }
