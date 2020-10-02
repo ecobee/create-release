@@ -1,0 +1,23 @@
+name: 'create-release-action'
+description: 'Outputs the number of unreleased commits'
+author: 'Anton Nguyen'
+inputs:
+  include-prerelease:
+    description: Do you want to include pre-releases?
+    default: "false"
+  default-branch:
+    description: "What branch to compare releases against"
+    required: false
+    default: "master"
+outputs:
+  commit-count:
+    description: How many commits are on in the new release
+  diff-url:
+    description: Diff Url
+  release-url:
+    description: Release url
+  new-version:
+    description: The version of the new release
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
