@@ -44,11 +44,11 @@ $ npm test
 
  PASS  __tests__/main.test.ts
   Run
-    ✓ calculates how many commits the repo is behind (38ms)
-    ✓ sets `unreleased-commit-count (33ms)
-    ✓ sets `unreleased-commit-messages (18ms)
-    ✓ sets `unreleased-diff-url (15ms)
-    ✓ sets `latest-release-date (16ms)
+    ✓ sets all the outputs on a successful run (51ms)
+    ✓ does not create a release if the github token env variable is not set (5ms)
+    ✓ does not create a release if the repo does not contain any releases (14ms)
+    ✓ does not create a release if the latest release is not found (12ms)
+    ✓ does not create a release if there are no unreleased commits  (17ms)
 ...
 ```
 
