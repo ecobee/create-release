@@ -3,7 +3,7 @@ export const successfulComparisonResponse = {
   status: 'behind',
   ahead_by: 1,
   behind_by: 2,
-  total_commits: 3,
+  total_commits: 4,
   commits: [
     {
       sha: '6dcb09b5b57875f334f61aebed695e2e4193db5e',
@@ -11,6 +11,18 @@ export const successfulComparisonResponse = {
         'https://github.com/octocat/Hello-World/commit/6dcb09b5b57875f334f61aebed695e2e4193db5e',
       commit: {
         message: 'Fix all the bugs'
+      },
+      author: {
+        login: 'octocat',
+        html_url: 'https://github.com/octocat'
+      }
+    },
+    {
+      sha: '2e1cfa82b035c26cbbbdae632cea070514eb8b773f',
+      html_url:
+        'https://github.com/octocat/Hello-World/commit/2e1cfa82b035c26cbbbdae632cea070514eb8b773f',
+      commit: {
+        message: ''
       },
       author: {
         login: 'octocat',

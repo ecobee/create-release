@@ -70,9 +70,18 @@ const run = async (): Promise<void> => {
 
     let authors = ''
     let commitSummary = ''
+    let foundAuthors = new Map<string, boolean>()
     comparison.commits.forEach(commit => {
-      authors += `* [${commit.author.login}](${commit.author.html_url})\n`
+      if (!foundAuthors.get(commit.author.login)) {
+        authors += `* [${commit.author.login}](${commit.author.html_url})\n`
+        foundAuthors.set(commit.author.login, true)
+      }
+
       let truncatedCommit = commit.commit.message
+      if (!truncatedCommit) {
+        return
+      }
+
       let commitLines = commit.commit.message.split('\n')
       if (commitLines.length > 0) {
         truncatedCommit = commitLines[0]

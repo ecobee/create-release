@@ -2,7 +2,6 @@
 
 * [octocat](https://github.com/octocat)
 * [antonnguyen](https://github.com/antonnguyen)
-* [antonnguyen](https://github.com/antonnguyen)
 
 ## Changes
 

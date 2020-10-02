@@ -53,11 +53,11 @@ describe('Run', () => {
     const expectedChangelog = fs.readFileSync(__dirname + '/expected-changelog.md', 'utf8')
     await run()
 
-    expect(debugMock).toHaveBeenCalledWith('master is behind by 3 commit(s)')
+    expect(debugMock).toHaveBeenCalledWith('master is behind by 4 commit(s)')
     expect(debugMock).toHaveBeenCalledWith(
       'latest release date is 2013-02-27T19:35:32Z'
     )
-    expect(setOutput).toHaveBeenCalledWith('commit-count', '3')
+    expect(setOutput).toHaveBeenCalledWith('commit-count', '4')
     expect(setOutput).toHaveBeenCalledWith('new-version', 'v1.0.1')
     expect(setOutput).toHaveBeenCalledWith(
       'release-url',
