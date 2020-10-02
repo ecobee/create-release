@@ -21,8 +21,8 @@ jobs:
       - name: Bump version and push tag
         id: create_tag
         uses: ecobee/create-release@v0.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 
