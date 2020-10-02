@@ -50,6 +50,7 @@ describe('Run', () => {
 
     const setOutput = jest.spyOn(core, 'setOutput')
     const debugMock = jest.spyOn(core, 'debug')
+    const expectedChangelog = fs.readFileSync(__dirname + '/expected-changelog.md', 'utf8')
     await run()
 
     expect(debugMock).toHaveBeenCalledWith('master is behind by 3 commit(s)')
@@ -57,14 +58,20 @@ describe('Run', () => {
       'latest release date is 2013-02-27T19:35:32Z'
     )
     expect(setOutput).toHaveBeenCalledWith('commit-count', '3')
+    expect(setOutput).toHaveBeenCalledWith('new-version', 'v1.0.1')
+    expect(setOutput).toHaveBeenCalledWith(
+      'release-url',
+      'https://github.com/foo/bar/releases/tag/v1.0.1'
+    )
     expect(setOutput).toHaveBeenCalledWith(
       'diff-url',
-      'https://github.com/octocat/Hello-World/compare/master...topic'
+      'https://github.com/foo/bar/compare/v1.0.0...v1.0.1'
     )
     expect(setOutput).toHaveBeenCalledWith(
       'latest-release-date',
       '2013-02-27T19:35:32Z'
     )
+    expect(setOutput).toHaveBeenCalledWith('changelog', expectedChangelog)
   })
 
   it('does not create a release if the github token env variable is not set', async () => {

@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as semver from 'semver'
 
 const run = async (): Promise<void> => {
   try {
@@ -52,12 +53,36 @@ const run = async (): Promise<void> => {
 
     core.setOutput('commit-count', comparison.total_commits.toString())
 
-    core.setOutput('diff-url', comparison.html_url)
-
     if (!comparison.total_commits) {
       core.debug('Release is up-to-date')
       return
     }
+
+    const newVersion = "v" + semver.inc(latestRelease?.tag_name, 'patch')
+    core.setOutput('new-version', newVersion)
+    core.setOutput(
+      'release-url',
+      `https://github.com/${owner}/${repo}/releases/tag/${newVersion}`
+    )
+
+    const compareUrl = `https://github.com/${owner}/${repo}/compare/${latestRelease.tag_name}...${newVersion}`
+    core.setOutput('diff-url', compareUrl)
+
+    let authors = ''
+    let commitSummary = ''
+    comparison.commits.forEach(commit => {
+      authors += `* [${commit.author.login}](${commit.author.html_url})\n`
+      let truncatedCommit = commit.commit.message
+      let commitLines = commit.commit.message.split('\n')
+      if (commitLines.length > 0) {
+        truncatedCommit = commitLines[0]
+      }
+      commitSummary += `* ${truncatedCommit} ([${commit.sha.slice(0, 7)}](${
+        commit.html_url
+      }))\n`
+    })
+    const changeLog = `## Authors\n\n${authors}\n## Changes\n\n${compareUrl}\n\n${commitSummary}`
+    core.setOutput('changelog', changeLog)
   } catch (error) {
     core.setFailed(`create-release failure: ${error}`)
   }

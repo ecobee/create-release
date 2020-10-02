@@ -18,6 +18,8 @@ outputs:
     description: Release url
   new-version:
     description: The version of the new release
+  changelog:
+    description: A markdown representation of the changes in the new release
 runs:
   using: 'node12'
   main: 'dist/index.js'
