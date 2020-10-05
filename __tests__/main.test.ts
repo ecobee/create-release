@@ -63,14 +63,19 @@ describe('Run', () => {
       .reply(201, successfulComparisonResponse)
 
     const setOutput = jest.spyOn(core, 'setOutput')
-    const debugMock = jest.spyOn(core, 'debug')
+    const infoMock = jest.spyOn(core, 'info')
     const setFailed = jest.spyOn(core, 'setFailed')
     await run()
 
-    expect(debugMock).toHaveBeenCalledWith('master is behind by 4 commit(s)')
-    expect(debugMock).toHaveBeenCalledWith(
+    expect(infoMock).toHaveBeenCalledWith('Listing releases for foo/bar')
+    expect(infoMock).toHaveBeenCalledWith(
+      'Comparing commits for foo/bar on v1.0.0 against master'
+    )
+    expect(infoMock).toHaveBeenCalledWith('master is behind by 4 commit(s)')
+    expect(infoMock).toHaveBeenCalledWith(
       'latest release date is 2013-02-27T19:35:32Z'
     )
+    expect(infoMock).toHaveBeenCalledWith('Creating release v1.0.1 for foo/bar')
     expect(setOutput).toHaveBeenCalledWith('commit-count', '4')
     expect(setOutput).toHaveBeenCalledWith('new-version', 'v1.0.1')
     expect(setOutput).toHaveBeenCalledWith(
@@ -123,7 +128,7 @@ describe('Run', () => {
   })
 
   it('does not create a release if there are no unreleased commits ', async () => {
-    const debugMock = jest.spyOn(core, 'debug')
+    const infoMock = jest.spyOn(core, 'info')
     nock('https://api.github.com')
       .persist()
       .get('/repos/foo/bar/releases')
@@ -133,6 +138,6 @@ describe('Run', () => {
       .get('/repos/foo/bar/compare/v1.0.0...master')
       .reply(200, upToDateComparisonResponse)
     await run()
-    expect(debugMock).toHaveBeenCalledWith('Release is up-to-date')
+    expect(infoMock).toHaveBeenCalledWith('Release is up-to-date')
   })
 })

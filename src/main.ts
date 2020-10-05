@@ -22,6 +22,8 @@ const run = async (): Promise<void> => {
     const octokit = github.getOctokit(githubToken)
     const nwo = process.env['GITHUB_REPOSITORY'] || '/'
     const [owner, repo] = nwo.split('/')
+
+    core.info(`Listing releases for ${owner}/${repo}`)
     const {data: releases} = await octokit.repos.listReleases({
       owner,
       repo
@@ -37,24 +39,29 @@ const run = async (): Promise<void> => {
       core.error(`Latest release for "${nwo}" could not be found`)
       return
     }
+
+    const base = latestRelease?.tag_name || ''
+    core.info(
+      `Comparing commits for ${owner}/${repo} on ${base} against ${defaultBranch}`
+    )
     const {data: comparison} = await octokit.repos.compareCommits({
       owner,
       repo,
-      base: latestRelease?.tag_name || '',
+      base,
       head: defaultBranch
     })
-    core.debug(
+    core.info(
       `${defaultBranch} is ${comparison.status} by ${comparison.total_commits} commit(s)`
     )
 
     const lastReleaseDate = latestRelease?.published_at || ''
     core.setOutput('latest-release-date', lastReleaseDate)
-    core.debug(`latest release date is ${lastReleaseDate}`)
+    core.info(`latest release date is ${lastReleaseDate}`)
 
     core.setOutput('commit-count', comparison.total_commits.toString())
 
     if (!comparison.total_commits) {
-      core.debug('Release is up-to-date')
+      core.info('Release is up-to-date')
       return
     }
 
@@ -94,6 +101,7 @@ const run = async (): Promise<void> => {
     const changeLog = `## Authors\n\n${authors}\n## Changes\n\n${compareUrl}\n\n${commitSummary}`
     core.setOutput('changelog', changeLog)
 
+    core.info(`Creating release ${newVersion} for ${owner}/${repo}`)
     await octokit.repos.createRelease({
       owner,
       repo,
