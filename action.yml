@@ -9,6 +9,10 @@ inputs:
     description: "What branch to compare releases against"
     required: false
     default: "master"
+  version-override:
+    description: "Is there a version that should be overridden?"
+    required: false
+    default: ""
 outputs:
   commit-count:
     description: How many commits are on in the new release
