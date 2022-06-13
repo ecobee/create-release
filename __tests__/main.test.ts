@@ -6,14 +6,12 @@ import {
   successfulComparisonResponse,
   successfulTagResponse,
   preReleaseTagResponse,
-  upToDateComparisonResponse,
-  successCreateReleaseResponse
+  upToDateComparisonResponse
 } from './mockResponses'
 
 const nock = require('nock')
 
 beforeEach(() => {
-  jest.resetModules()
   jest.resetModules()
   jest.resetAllMocks()
   const doc = yaml.safeLoad(
@@ -94,6 +92,51 @@ describe('Run', () => {
     expect(setFailed).not.toHaveBeenCalled()
   })
 
+  it('allows the version to be overriden', async () => {
+    const versionOverride = 'v1.0.1-beta.1'
+    jest.spyOn(core, 'getInput').mockImplementation(name => {
+      if (name == 'version-override') {
+        return versionOverride
+      } else if (name == 'default-branch') {
+        return 'master'
+      }
+      return 'false'
+    })
+
+    nock('https://api.github.com')
+      .persist()
+      .get('/repos/foo/bar/releases')
+      .reply(200, successfulTagResponse)
+    nock('https://api.github.com')
+      .persist()
+      .get('/repos/foo/bar/compare/v1.0.0...master')
+      .reply(200, successfulComparisonResponse)
+    nock('https://api.github.com')
+      .persist()
+      .post('/repos/foo/bar/releases')
+      .reply(201, successfulComparisonResponse)
+
+    const setOutput = jest.spyOn(core, 'setOutput')
+    const infoMock = jest.spyOn(core, 'info')
+    const setFailed = jest.spyOn(core, 'setFailed')
+    await run()
+
+    expect(infoMock).toHaveBeenCalledWith(
+      `Creating release ${versionOverride} for foo/bar`
+    )
+    expect(setOutput).toHaveBeenCalledWith('commit-count', '4')
+    expect(setOutput).toHaveBeenCalledWith('new-version', versionOverride)
+    expect(setOutput).toHaveBeenCalledWith(
+      'release-url',
+      `https://github.com/foo/bar/releases/tag/${versionOverride}`
+    )
+    expect(setOutput).toHaveBeenCalledWith(
+      'diff-url',
+      `https://github.com/foo/bar/compare/v1.0.0...${versionOverride}`
+    )
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+
   it('does not create a release if the github token env variable is not set', async () => {
     process.env.GITHUB_TOKEN = ''
     const errorMock = jest.spyOn(core, 'error')
@@ -128,6 +171,15 @@ describe('Run', () => {
   })
 
   it('does not create a release if there are no unreleased commits ', async () => {
+    jest.spyOn(core, 'getInput').mockImplementation(name => {
+      if (name == 'version-override') {
+        return ''
+      } else if (name == 'default-branch') {
+        return 'master'
+      }
+      return 'false'
+    })
+
     const infoMock = jest.spyOn(core, 'info')
     nock('https://api.github.com')
       .persist()

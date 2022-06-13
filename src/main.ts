@@ -13,6 +13,10 @@ const run = async (): Promise<void> => {
       required: false
     })
 
+    const versionOverride = core.getInput('version-override', {
+      required: false
+    })
+
     const githubToken = process.env['GITHUB_TOKEN']
     if (!githubToken) {
       core.error("environment variable 'GITHUB_TOKEN' is not set")
@@ -66,7 +70,10 @@ const run = async (): Promise<void> => {
     }
 
     const newTag = semver.inc(latestRelease?.tag_name, 'patch')
-    const newVersion = `v${newTag}`
+    let newVersion = `v${newTag}`
+    if (versionOverride) {
+      newVersion = versionOverride
+    }
     core.setOutput('new-version', newVersion)
     core.setOutput(
       'release-url',

@@ -1588,6 +1588,9 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const defaultBranch = core.getInput('default-branch', {
             required: false
         });
+        const versionOverride = core.getInput('version-override', {
+            required: false
+        });
         const githubToken = process.env['GITHUB_TOKEN'];
         if (!githubToken) {
             core.error("environment variable 'GITHUB_TOKEN' is not set");
@@ -1628,7 +1631,10 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const newTag = semver.inc(latestRelease === null || latestRelease === void 0 ? void 0 : latestRelease.tag_name, 'patch');
-        const newVersion = `v${newTag}`;
+        let newVersion = `v${newTag}`;
+        if (versionOverride) {
+            newVersion = versionOverride;
+        }
         core.setOutput('new-version', newVersion);
         core.setOutput('release-url', `https://github.com/${owner}/${repo}/releases/tag/${newVersion}`);
         const compareUrl = `https://github.com/${owner}/${repo}/compare/${latestRelease.tag_name}...${newVersion}`;
