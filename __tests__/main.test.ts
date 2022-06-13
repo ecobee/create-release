@@ -6,14 +6,12 @@ import {
   successfulComparisonResponse,
   successfulTagResponse,
   preReleaseTagResponse,
-  upToDateComparisonResponse,
-  successCreateReleaseResponse
+  upToDateComparisonResponse
 } from './mockResponses'
 
 const nock = require('nock')
 
 beforeEach(() => {
-  jest.resetModules()
   jest.resetModules()
   jest.resetAllMocks()
   const doc = yaml.safeLoad(
@@ -96,12 +94,14 @@ describe('Run', () => {
 
   it('allows the version to be overriden', async () => {
     const versionOverride = 'v1.0.1-beta.1'
-    // how do we mock `core.getInput` to return `versionOverride` if `default-branch` is the input?
-
-    const expectedChangelog = fs.readFileSync(
-      __dirname + '/expected-changelog.md',
-      'utf8'
-    )
+    jest.spyOn(core, 'getInput').mockImplementation(name => {
+      if (name == 'version-override') {
+        return versionOverride
+      } else if (name == 'default-branch') {
+        return 'master'
+      }
+      return 'false'
+    })
 
     nock('https://api.github.com')
       .persist()
@@ -113,11 +113,7 @@ describe('Run', () => {
       .reply(200, successfulComparisonResponse)
     nock('https://api.github.com')
       .persist()
-      .post('/repos/foo/bar/releases', {
-        tag_name: versionOverride,
-        name: versionOverride,
-        body: expectedChangelog
-      })
+      .post('/repos/foo/bar/releases')
       .reply(201, successfulComparisonResponse)
 
     const setOutput = jest.spyOn(core, 'setOutput')
@@ -125,14 +121,6 @@ describe('Run', () => {
     const setFailed = jest.spyOn(core, 'setFailed')
     await run()
 
-    expect(infoMock).toHaveBeenCalledWith('Listing releases for foo/bar')
-    expect(infoMock).toHaveBeenCalledWith(
-      'Comparing commits for foo/bar on v1.0.0 against master'
-    )
-    expect(infoMock).toHaveBeenCalledWith('master is behind by 4 commit(s)')
-    expect(infoMock).toHaveBeenCalledWith(
-      'latest release date is 2013-02-27T19:35:32Z'
-    )
     expect(infoMock).toHaveBeenCalledWith(
       `Creating release ${versionOverride} for foo/bar`
     )
@@ -146,11 +134,6 @@ describe('Run', () => {
       'diff-url',
       `https://github.com/foo/bar/compare/v1.0.0...${versionOverride}`
     )
-    expect(setOutput).toHaveBeenCalledWith(
-      'latest-release-date',
-      '2013-02-27T19:35:32Z'
-    )
-    expect(setOutput).toHaveBeenCalledWith('changelog', expectedChangelog)
     expect(setFailed).not.toHaveBeenCalled()
   })
 
@@ -188,6 +171,15 @@ describe('Run', () => {
   })
 
   it('does not create a release if there are no unreleased commits ', async () => {
+    jest.spyOn(core, 'getInput').mockImplementation(name => {
+      if (name == 'version-override') {
+        return ''
+      } else if (name == 'default-branch') {
+        return 'master'
+      }
+      return 'false'
+    })
+
     const infoMock = jest.spyOn(core, 'info')
     nock('https://api.github.com')
       .persist()
