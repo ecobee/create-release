@@ -14,7 +14,7 @@ name: Deploy To Prod
 on: workflow_dispatch
 
 jobs:
-  deplay:
+  deploy:
     name: Production deployment
     runs-on: ubuntu-latest
     steps:
