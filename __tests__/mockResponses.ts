@@ -35,10 +35,6 @@ export const successfulComparisonResponse = {
         'https://github.com/octocat/Hello-World/commit/f0c556fd81d38b23ff2b9c7c9d192ff426ff35bbc4',
       commit: {
         message: 'Title of my commit\nBody of my message'
-      },
-      author: {
-        login: 'antonnguyen',
-        html_url: 'https://github.com/antonnguyen'
       }
     },
     {
