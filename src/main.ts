@@ -28,7 +28,7 @@ const run = async (): Promise<void> => {
     const [owner, repo] = nwo.split('/')
 
     core.info(`Listing releases for ${owner}/${repo}`)
-    const {data: releases} = await octokit.repos.listReleases({
+    const {data: releases} = await octokit.rest.repos.listReleases({
       owner,
       repo
     })
@@ -48,7 +48,7 @@ const run = async (): Promise<void> => {
     core.info(
       `Comparing commits for ${owner}/${repo} on ${base} against ${defaultBranch}`
     )
-    const {data: comparison} = await octokit.repos.compareCommits({
+    const {data: comparison} = await octokit.rest.repos.compareCommits({
       owner,
       repo,
       base,
@@ -110,7 +110,7 @@ const run = async (): Promise<void> => {
     core.setOutput('changelog', changeLog)
 
     core.info(`Creating release ${newVersion} for ${owner}/${repo}`)
-    await octokit.repos.createRelease({
+    await octokit.rest.repos.createRelease({
       owner,
       repo,
       tag_name: newVersion, // eslint-disable-line @typescript-eslint/camelcase
