@@ -25,5 +25,5 @@ outputs:
   changelog:
     description: A markdown representation of the changes in the new release
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
