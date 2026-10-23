@@ -33,7 +33,7 @@ const run = async (): Promise<void> => {
       repo
     })
     if (releases.length === 0) {
-      core.error(`No releases for "${nwo}" has been found`)
+      core.error(`No releases for "${nwo}" have been found`)
       return
     }
     const latestRelease = releases.find(
