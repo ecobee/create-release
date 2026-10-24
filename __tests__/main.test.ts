@@ -154,7 +154,7 @@ describe('Run', () => {
     const errorMock = jest.spyOn(core, 'error')
     await run()
     expect(errorMock).toHaveBeenCalledWith(
-      'No releases for "foo/bar" has been found'
+      'No releases for "foo/bar" have been found'
     )
   })
 
